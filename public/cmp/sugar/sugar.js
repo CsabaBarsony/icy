@@ -7,37 +7,69 @@
      * @constructor
      */
     function Sugar(container, suggestions) {
-        this.text = '';
         this.root = document.createElement('div');
-        this.root.className += 'cmp';
-        this.root.className += ' sugar';
+        this.root.className += 'cmp sugar cmp-root';
+
         this.root.innerHTML = `
             <input type="text" />
-            <div class="sugar-suggestions"></div>
+            <div class="cmp sugar suggestions"></div>
         `;
+
         let input = this.root.querySelector('input');
-        input.addEventListener('focus', e => {
-            console.log('focus', e);
+
+        input.addEventListener('focus', () => {
+            this.trigger(Event.SELECT);
         });
+
+        input.addEventListener('blur', () => {
+            this.trigger(Event.UNSELECT);
+        });
+
         input.addEventListener('input', e => {
-            console.log('input', e);
+
         });
-        input.addEventListener('keydown', e => {
-            console.log('keydown', e);
-            this.text = e.key;
+
+        input.addEventListener('keypress', e => {
+
         });
+
         this.data = prop({
             selectedIndex: -1,
             suggestions: suggestions
         });
+
         this.data.on((data) => {
             this.render(data);
         });
+
         container.appendChild(this.root);
     }
 
-    Sugar.prototype.render = function(data) {
-        
+    /**
+     * @param {Event} event
+     * @param {Object} [data]
+     */
+    Sugar.prototype.trigger = function(event, data = null) {
+        switch(event) {
+            case Event.SELECT:
+                break;
+            case Event.UNSELECT:
+                break;
+        }
+    };
+
+    /**
+     * @enum {string}
+     */
+    const Event = {
+        SELECT: 'select',
+        UNSELECT: 'unselect',
+        TYPE: 'type',
+        CLEAR: 'clear',
+        LOAD: 'load',
+        EXCITE: 'excite',
+        BORE: 'bore',
+        CHOOSE: 'choose'
     };
 
     /**
