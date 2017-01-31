@@ -1,33 +1,31 @@
 'use strict';
 /* global describe, xdescribe, it, beforeEach, afterEach, expect, app */
 
-describe('Sugar practical way', function() {
+describe('Sugar', function() {
     const Sugar = app.sugar.Sugar,
           Suggestion = app.sugar.Suggestion;
 
     let container = document.getElementById('container'),
-        instance,
         input;
 
     describe('simulate user activity', function() {
-        let onType,
-            sugar,
+        let sugar,
             input,
             suggestField;
 
-        function onSelect(suggestion) {
-            console.log(suggestion);
-        }
-
         beforeEach(function(done) {
-            onType = function (text) {
+            function onType (text) {
                 return new Promise(function(resolve, reject) {
                     setTimeout(function() {
                         resolve([new Suggestion('avocado'), new Suggestion('broccoli')]);
                         done();
                     }, 0);
                 });
-            };
+            }
+
+            function onSelect(suggestion) {
+                console.log(suggestion);
+            }
 
             sugar = new Sugar(document.getElementById('container'), onType, onSelect, [new Suggestion('one'), new Suggestion('two')]);
             input = container.querySelector('input');
@@ -35,6 +33,10 @@ describe('Sugar practical way', function() {
             input.focus();
             input.value = 'majom';
             input.dispatchEvent(new KeyboardEvent('input'));
+        });
+
+        afterEach(function() {
+            container.innerHTML = '';
         });
 
         it('type', function(done) {
