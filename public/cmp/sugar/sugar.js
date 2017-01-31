@@ -3,74 +3,134 @@
 (function(app, scion, prop, Handlebars) {
     /**
      * @param {HTMLElement} container
+     * @param {function(string, function)} onType
+     * @param {function(Food)} onSelect
      * @param {Suggestion[]} [suggestions]
      * @constructor
      */
-    function Sugar(container, suggestions) {
-        this.root = document.createElement('div');
-        this.root.className += 'cmp sugar cmp-root';
+    function Sugar(container, onType, onSelect, suggestions = []) {
+        const root = document.createElement('div');
+        root.className += 'cmp sugar cmp-root';
 
-        this.root.innerHTML = `
+        root.innerHTML = `
             <input type="text" />
             <div class="cmp sugar suggestions"></div>
         `;
 
-        let input = this.root.querySelector('input');
+        const suggestionContainer = root.querySelector('.suggestions');
 
-        input.addEventListener('focus', () => {
-            this.trigger(Event.SELECT);
-        });
-
-        input.addEventListener('blur', () => {
-            this.trigger(Event.UNSELECT);
-        });
-
-        input.addEventListener('input', e => {
-
-        });
-
-        input.addEventListener('keypress', e => {
-
-        });
+        this.suggestions = suggestions;
 
         this.data = prop({
             selectedIndex: -1,
             suggestions: suggestions
         });
 
-        this.data.on((data) => {
-            this.render(data);
+        this.data.on((newData, oldData) => {
+            var d = this.data();
+            var template = `
+                <ul>
+                    {{#each suggestions}}
+                    <li{{#if selected}} class="selected"{{/if}}>{{text}}</li>
+                    {{/each}}
+                </ul>`;
+            let HTMLString = Handlebars.compile(template)({ suggestions: d.suggestions });
+            suggestionContainer.innerHTML = HTMLString;
         });
 
-        container.appendChild(this.root);
+        let input = root.querySelector('input');
+
+        input.addEventListener('focus', () => {
+            sc.gen('select');
+        });
+
+        input.addEventListener('input', e => {
+            if(e.target.value) sc.gen('type', e.target.value);
+            else sc.gen('clear');
+        });
+
+        container.appendChild(root);
+
+        var actions = {
+            blur: {
+                entry: () => {
+                    console.log('blur entry')
+                }
+            },
+            loading: {
+                entry: ev => {
+                    console.log('loading entry');
+                    let suggestionsPromise = onType(ev.data);
+
+                    suggestionsPromise.then(function(suggestions) {
+                        sc.gen('load', suggestions);
+                    });
+                }
+            },
+            suggesting: {
+                entry: ev => {
+                    let d = this.data();
+                    d.suggestions = ev.data;
+                    this.data(d);
+                }
+            }
+        };
+
+        var states = [
+            {
+                id: 'blur',
+                onEntry: actions.blur.entry,
+                transitions: [
+                    {
+                        event: 'select',
+                        target: 'hidden'
+                    }
+                ]
+            },
+            {
+                id: 'focus',
+                transitions: [
+                    {
+                        event: 'unselect',
+                        target: 'blur'
+                    }
+                ],
+                states: [
+                    {
+                        id: 'hidden',
+                        transitions: [
+                            {
+                                event: 'type',
+                                target: 'loading'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'visible',
+                        states: [
+                            {
+                                id: 'loading',
+                                onEntry: actions.loading.entry,
+                                transitions: [
+                                    {
+                                        event: 'load',
+                                        target: 'suggesting'
+                                    }
+                                ]
+                            },
+                            {
+                                id: 'suggesting',
+                                onEntry: actions.suggesting.entry
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: false });
+        sc.start();
     }
-
-    /**
-     * @param {Event} event
-     * @param {Object} [data]
-     */
-    Sugar.prototype.trigger = function(event, data = null) {
-        switch(event) {
-            case Event.SELECT:
-                break;
-            case Event.UNSELECT:
-                break;
-        }
-    };
-
-    /**
-     * @enum {string}
-     */
-    const Event = {
-        SELECT: 'select',
-        UNSELECT: 'unselect',
-        TYPE: 'type',
-        CLEAR: 'clear',
-        LOAD: 'load',
-        EXCITE: 'excite',
-        BORE: 'bore',
-        CHOOSE: 'choose'
-    };
 
     /**
      * @param {string} text
@@ -95,4 +155,5 @@
         Suggestion: Suggestion,
         Direction:  Direction
     };
+
 }(app, scion, bella.prop, Handlebars));

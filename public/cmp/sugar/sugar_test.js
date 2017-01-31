@@ -1,38 +1,48 @@
 'use strict';
 /* global describe, xdescribe, it, beforeEach, afterEach, expect, app */
 
-describe('Sugar', function() {
-    let instance;
+describe('Sugar practical way', function() {
+    const Sugar = app.sugar.Sugar,
+          Suggestion = app.sugar.Suggestion;
 
-    beforeEach(function() {
-        instance = new app.sugar.Sugar(document.getElementById('container'));
-    });
-
-    it('should...', function() {
-        instance.focusChange(true);
-        instance.inputChange('majom');
-        expect(1).toBe(1);
-    });
-});
-
-xdescribe('Sugar practical way', function() {
     let container = document.getElementById('container'),
         instance,
         input;
 
-    beforeEach(function() {
-        instance = new app.sugar.Sugar(container);
-    });
+    describe('simulate user activity', function() {
+        let onType,
+            sugar,
+            input,
+            suggestField;
 
-    afterEach(function() {
-        console.log(input.value);
-        //container.innerHTML = '';
-    });
+        function onSelect(suggestion) {
+            console.log(suggestion);
+        }
 
-    it('should...', function() {
-        input = container.querySelector('input');
-        input.focus();
-        input.dispatchEvent(new KeyboardEvent('keypress', { key: 'x' }));
-        expect(1).toBe(1);
+        beforeEach(function(done) {
+            onType = function (text) {
+                return new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                        resolve([new Suggestion('avocado'), new Suggestion('broccoli')]);
+                        done();
+                    }, 0);
+                });
+            };
+
+            sugar = new Sugar(document.getElementById('container'), onType, onSelect, [new Suggestion('one'), new Suggestion('two')]);
+            input = container.querySelector('input');
+            suggestField = container.querySelector('.suggestions');
+            input.focus();
+            input.value = 'majom';
+            input.dispatchEvent(new KeyboardEvent('input'));
+        });
+
+        it('type', function(done) {
+            setTimeout(function() {
+                let listElements = suggestField.querySelectorAll('li');
+                expect(listElements.length).toBe(2);
+                done();
+            }, 0);
+        });
     });
 });
