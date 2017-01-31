@@ -8,7 +8,7 @@ describe('Sugar', function() {
     let container = document.getElementById('container'),
         input;
 
-    describe('simulate user activity', function() {
+    describe('type', function() {
         let sugar,
             input,
             suggestField;
@@ -39,10 +39,12 @@ describe('Sugar', function() {
             container.innerHTML = '';
         });
 
-        it('type', function(done) {
+        it('should display 2 suggestions', function(done) {
             setTimeout(function() {
                 let listElements = suggestField.querySelectorAll('li');
                 expect(listElements.length).toBe(2);
+                expect(listElements[0].textContent).toBe('avocado');
+                expect(listElements[1].textContent).toBe('broccoli');
                 done();
             }, 0);
         });

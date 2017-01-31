@@ -3,11 +3,12 @@
 const app = {};
 
 function home(Sugar, Suggestion) {
-    function onType(text, callback) {
-        debugger
-        setTimeout(function() {
-            callback([new Suggestion('avocado'), new Suggestion('broccoli')]);
-        }, 300);
+    function onType(text) {
+        return new Promise(function(resolve) {
+            setTimeout(function() {
+                resolve([new Suggestion('avocado'), new Suggestion('broccoli')]);
+            }, 300);
+        });
     }
 
     function onSelect(suggestion) {

@@ -49,17 +49,28 @@
             else sc.gen('clear');
         });
 
+        input.addEventListener('keydown', e => {
+            if(e.key === 'Enter') {
+                sc.gen('choose');
+            }
+            else {
+                // Itt tartok, ez így nem jó
+                let event = this.data().selectedIndex >= 0 ? 'excite' : 'bore';
+
+                if(e.key === 'ArrowUp') {
+                    sc.gen(event, Direction.UP);
+                }
+                else if(e.key === 'ArrowDown') {
+                    sc.gen(event, Direction.DOWN);
+                }
+            }
+        });
+
         container.appendChild(root);
 
         var actions = {
-            blur: {
-                entry: () => {
-                    console.log('blur entry')
-                }
-            },
             loading: {
                 entry: ev => {
-                    console.log('loading entry');
                     let suggestionsPromise = onType(ev.data);
 
                     suggestionsPromise.then(function(suggestions) {
@@ -67,7 +78,7 @@
                     });
                 }
             },
-            suggesting: {
+            typing: {
                 entry: ev => {
                     let d = this.data();
                     d.suggestions = ev.data;
@@ -79,7 +90,6 @@
         var states = [
             {
                 id: 'blur',
-                onEntry: actions.blur.entry,
                 transitions: [
                     {
                         event: 'select',
@@ -114,13 +124,21 @@
                                 transitions: [
                                     {
                                         event: 'load',
-                                        target: 'suggesting'
+                                        target: 'typing'
                                     }
                                 ]
                             },
                             {
                                 id: 'suggesting',
-                                onEntry: actions.suggesting.entry
+                                states: [
+                                    {
+                                        id: 'typing',
+                                        onEntry: actions.typing.entry
+                                    },
+                                    {
+                                        id: 'excited'
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -128,9 +146,37 @@
             }
         ];
 
-        var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: false });
+        var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: true });
         sc.start();
     }
+
+    /**
+     * @param {Direction} direction
+     */
+    Sugar.prototype.changeSelection = function(direction) {
+        let data = this.data();
+
+        if(direction === Direction.UP) {
+            if(data.selectedIndex >= 0) {
+                data.selectedIndex--;
+                this.data(data);
+            }
+            else {
+                data.selectedIndex = data.suggestions.length - 1;
+                this.data(data);
+            }
+        }
+        else {
+            if(data.selectedIndex === data.suggestions.length - 1) {
+                data.selectedIndex = -1;
+                this.data(data);
+            }
+            else {
+                data.selectedIndex++;
+                this.data(data);
+            }
+        }
+    };
 
     /**
      * @param {string} text
