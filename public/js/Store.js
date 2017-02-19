@@ -1,6 +1,6 @@
 'use strict';
 
-(function(app, bella) {
+(function(bella) {
     function Store() {}
 
     Store.prototype.getFood = function(id, callback) {
@@ -19,4 +19,4 @@
     };
 
     app.Store = Store;
-}(app, bella));
+}(bella));

@@ -1,9 +1,9 @@
 'use strict';
-/* global describe, xdescribe, it, beforeEach, afterEach, expect, app */
+/* global describe, xdescribe, it, beforeEach, afterEach, expect */
 
 describe('Sugar', function() {
-    const Sugar = app.sugar.Sugar,
-          Suggestion = app.sugar.Suggestion;
+    const Sugar = sugar.Sugar,
+          Suggestion = sugar.Suggestion;
 
     let container = document.getElementById('container'),
         input;
@@ -27,7 +27,7 @@ describe('Sugar', function() {
                 console.log(suggestion);
             }
 
-            sugar = new Sugar(document.getElementById('container'), onType, onSelect, [new Suggestion('one'), new Suggestion('two')]);
+            sugar = new Sugar(document.getElementById('container'), onType, onSelect);
             input = container.querySelector('input');
             suggestField = container.querySelector('.suggestions');
             input.focus();
@@ -40,13 +40,19 @@ describe('Sugar', function() {
         });
 
         it('should display 2 suggestions', function(done) {
-            setTimeout(function() {
+            let listElements = suggestField.querySelectorAll('li');
+            expect(listElements.length).toBe(2);
+            expect(listElements[0].textContent).toBe('avocado');
+            expect(listElements[1].textContent).toBe('broccoli');
+            done();
+
+            /*setTimeout(function() {
                 let listElements = suggestField.querySelectorAll('li');
                 expect(listElements.length).toBe(2);
                 expect(listElements[0].textContent).toBe('avocado');
                 expect(listElements[1].textContent).toBe('broccoli');
                 done();
-            }, 0);
+            }, 0);*/
         });
     });
 });

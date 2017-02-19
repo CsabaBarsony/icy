@@ -13,19 +13,24 @@
   <script src="jasmine.js"></script>
   <script src="jasmine-html.js"></script>
   <script src="boot.js"></script>
+  <script>
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100;
+  </script>
 
   <!-- include source files here... -->
   <script>var app = {}</script>
-  <script src="../public/lib/scion.js"></script>
-  <script src="../public/lib/bella.js"></script>
-  <script src="../public/lib/Handlebars.js"></script>
-  <script src="../public/cmp/suggest/suggest.js"></script>
-  <script src="../public/cmp/cat/cat.js"></script>
-  <script src="../public/cmp/sugar/sugar.js"></script>
+  <script src="../public/js/scion.js"></script>
+  <script src="../public/js/bella.js"></script>
+  <script src="../public/js/Handlebars.js"></script>
+  <script src="../public/js/cmp/suggest/suggest.js"></script>
+  <script src="../public/js/cmp/cat/cat.js"></script>
+  <script src="../public/js/cmp/sugar/sugar.js"></script>
+  <script src="../public/js/cmp/candy/candy.js"></script>
 
   <!-- include spec files here... -->
   <!--<script src="../public/cmp/suggest/suggest_test.js"></script>-->
   <!--<script src="../public/cmp/cat/cat_test.js"></script>-->
-  <script src="../public/cmp/sugar/sugar_test.js"></script>
+  <!--<script src="../public/js/sugar/sugar_test.js"></script>-->
+  <script src="../public/js/cmp/candy/candy_test.js"></script>
 </body>
 </html>

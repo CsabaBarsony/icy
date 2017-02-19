@@ -1,14 +1,13 @@
 'use strict';
 
-(function(app, scion, prop, Handlebars) {
+(function(scion, prop, Handlebars) {
     /**
      * @param {HTMLElement} container
      * @param {function(string, function)} onType
      * @param {function(Food)} onSelect
-     * @param {Suggestion[]} [suggestions]
      * @constructor
      */
-    function Sugar(container, onType, onSelect, suggestions = []) {
+    function Sugar(container, onType, onSelect) {
         const root = document.createElement('div');
         root.className += 'cmp sugar cmp-root';
 
@@ -19,11 +18,9 @@
 
         const suggestionContainer = root.querySelector('.suggestions');
 
-        this.suggestions = suggestions;
-
         this.data = prop({
             selectedIndex: -1,
-            suggestions: suggestions
+            suggestions: []
         });
 
         this.data.on((newData, oldData) => {
@@ -50,19 +47,19 @@
         });
 
         input.addEventListener('keydown', e => {
+            const selectedIndex = this.data().selectedIndex;
+
+            if(e.key === 'ArrowUp') {
+                selectedIndex === 1 ? sc.gen('bore', Direction.UP) : sc.gen('excite', Direction.DOWN);
+            }
+            else if(e.key === 'ArrowDown') {
+                selectedIndex === this.data().suggestions.length - 1 ?
+                    sc.gen('bore',   Direction.DOWN) :
+                    sc.gen('excite', Direction.UP);
+            }
+
             if(e.key === 'Enter') {
                 sc.gen('choose');
-            }
-            else {
-                // Itt tartok, ez így nem jó
-                let event = this.data().selectedIndex >= 0 ? 'excite' : 'bore';
-
-                if(e.key === 'ArrowUp') {
-                    sc.gen(event, Direction.UP);
-                }
-                else if(e.key === 'ArrowDown') {
-                    sc.gen(event, Direction.DOWN);
-                }
             }
         });
 
@@ -196,10 +193,9 @@
         DOWN: 'down'
     };
 
-    app.sugar = {
-        Sugar:      Sugar,
-        Suggestion: Suggestion,
-        Direction:  Direction
+    window.sugar = {
+        Sugar: Sugar,
+        Suggestion: Suggestion
     };
-
-}(app, scion, bella.prop, Handlebars));
+    
+}(scion, bella.prop, Handlebars));
