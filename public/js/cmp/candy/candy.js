@@ -75,7 +75,9 @@
         });
     };
 
-    window.candy = {
+    window.cmp = window.cmp || {};
+
+    window.cmp.candy = {
         Candy: Candy
     };
 }(Handlebars, scion));

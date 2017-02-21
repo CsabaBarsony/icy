@@ -1,41 +1,22 @@
 'use strict';
 
-(function(scion, prop, Handlebars) {
-    /**
-     * @param {HTMLElement} container
-     * @param {function(string, function)} onType
-     * @param {function(Food)} onSelect
-     * @constructor
-     */
+(function(scion, Handlebars) {
     function Sugar(container, onType, onSelect) {
-        const root = document.createElement('div');
-        root.className += 'cmp sugar cmp-root';
-
-        root.innerHTML = `
+        container.innerHTML = `
             <input type="text" />
-            <div class="cmp sugar suggestions"></div>
         `;
 
-        const suggestionContainer = root.querySelector('.suggestions');
+        this.suggestionContainer = document.createElement('div');
+        this.suggestionContainer.className += 'suggestions';
 
-        this.data = prop({
+        container.append(this.suggestionContainer);
+
+        this.model = {
             selectedIndex: -1,
             suggestions: []
-        });
+        };
 
-        this.data.on((newData, oldData) => {
-            var d = this.data();
-            var template = `
-                <ul>
-                    {{#each suggestions}}
-                    <li{{#if selected}} class="selected"{{/if}}>{{text}}</li>
-                    {{/each}}
-                </ul>`;
-            let HTMLString = Handlebars.compile(template)({ suggestions: d.suggestions });
-            suggestionContainer.innerHTML = HTMLString;
-        });
-
-        let input = root.querySelector('input');
+        let input = container.querySelector('input');
 
         input.addEventListener('focus', () => {
             sc.gen('select');
@@ -47,13 +28,11 @@
         });
 
         input.addEventListener('keydown', e => {
-            const selectedIndex = this.data().selectedIndex;
-
             if(e.key === 'ArrowUp') {
-                selectedIndex === 1 ? sc.gen('bore', Direction.UP) : sc.gen('excite', Direction.DOWN);
+                this.model.selectedIndex === 1 ? sc.gen('bore', Direction.UP) : sc.gen('excite', Direction.DOWN);
             }
             else if(e.key === 'ArrowDown') {
-                selectedIndex === this.data().suggestions.length - 1 ?
+                this.model.selectedIndex === this.data().suggestions.length - 1 ?
                     sc.gen('bore',   Direction.DOWN) :
                     sc.gen('excite', Direction.UP);
             }
@@ -62,8 +41,6 @@
                 sc.gen('choose');
             }
         });
-
-        container.appendChild(root);
 
         var actions = {
             loading: {
@@ -145,57 +122,55 @@
 
         var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: true });
         sc.start();
+
+        this.render();
     }
 
-    /**
-     * @param {Direction} direction
-     */
-    Sugar.prototype.changeSelection = function(direction) {
-        let data = this.data();
+    Sugar.prototype.render = function() {
+        var template = `
+                <ul>
+                    {{#each suggestions}}
+                    <li{{#if selected}} class="selected"{{/if}}>{{text}}</li>
+                    {{/each}}
+                </ul>`;
 
+        this.suggestionContainer.innerHTML = Handlebars.compile(template)(this.model);
+    };
+
+    Sugar.prototype.changeSelection = function(direction) {
         if(direction === Direction.UP) {
             if(data.selectedIndex >= 0) {
-                data.selectedIndex--;
-                this.data(data);
+                this.model.selectedIndex--;
             }
             else {
-                data.selectedIndex = data.suggestions.length - 1;
-                this.data(data);
+                this.model.selectedIndex = data.suggestions.length - 1;
             }
         }
         else {
             if(data.selectedIndex === data.suggestions.length - 1) {
-                data.selectedIndex = -1;
-                this.data(data);
+                this.model.selectedIndex = -1;
             }
             else {
-                data.selectedIndex++;
-                this.data(data);
+                this.model.selectedIndex++;
             }
         }
     };
 
-    /**
-     * @param {string} text
-     * @param {Object} [data]
-     * @constructor
-     */
     function Suggestion(text, data = {}) {
         this.text = text;
         this.data = data;
     }
 
-    /**
-     * @enum {string}
-     */
     var Direction = {
         UP:   'up',
         DOWN: 'down'
     };
 
-    window.sugar = {
+    window.cmp = window.cmp || {};
+
+    window.cmp.sugar = {
         Sugar: Sugar,
         Suggestion: Suggestion
     };
     
-}(scion, bella.prop, Handlebars));
+}(scion, Handlebars));

@@ -2,7 +2,7 @@
 
 describe('Candy input()', function() {
     let candyInstance,
-        container = document.createElement('div');
+        container = document.getElementById('container');
 
     describe('', function() {
         beforeEach(function() {
@@ -16,6 +16,10 @@ describe('Candy input()', function() {
             );
             const button = container.querySelector('.add_message');
             button.click();
+        });
+
+        afterEach(function() {
+            container.innerHTML = '';
         });
 
         it('should display loading', function() {
@@ -40,9 +44,14 @@ describe('Candy input()', function() {
             button.click();
         });
 
+        afterEach(function() {
+            container.innerHTML = '';
+        });
+
         it('should add a third message item', function(done) {
             setTimeout(function() {
-                expect(candyInstance.model.messages.length).toBe(3);
+                let items = container.querySelectorAll('li');
+                expect(items.length).toBe(3);
                 done();
             }, 0);
         });
@@ -65,6 +74,10 @@ describe('Candy input()', function() {
             );
             const button = container.querySelector('.add_message');
             button.click();
+        });
+
+        afterEach(function() {
+            container.innerHTML = '';
         });
 
         it('should invoke callback', function(done) {
