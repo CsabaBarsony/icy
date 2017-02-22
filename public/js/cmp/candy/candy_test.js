@@ -6,7 +6,7 @@ describe('Candy input()', function() {
 
     describe('', function() {
         beforeEach(function() {
-            candyInstance = new candy.Candy(container,
+            candyInstance = new cmp.candy.Candy(container,
                 function() {
                     return new Promise(function(resolve) {
                         resolve('majom');
@@ -29,7 +29,7 @@ describe('Candy input()', function() {
 
     describe('', function() {
         beforeEach(function(done) {
-            candyInstance = new candy.Candy(container,
+            candyInstance = new cmp.candy.Candy(container,
                 function() {
                     return new Promise(function(resolve) {
                         setTimeout(function() {
@@ -61,7 +61,7 @@ describe('Candy input()', function() {
         let callbackHaveBeenCalled = false;
 
         beforeEach(function(done) {
-            candyInstance = new candy.Candy(container,
+            candyInstance = new cmp.candy.Candy(container,
                 function() {
                     return new Promise(function(resolve) {
                         resolve('majom');

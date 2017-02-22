@@ -54,9 +54,13 @@
             },
             typing: {
                 entry: ev => {
-                    let d = this.data();
-                    d.suggestions = ev.data;
-                    this.data(d);
+
+                }
+            },
+            suggesting: {
+                entry: ev => {
+                    this.model.suggestions = ev.data;
+                    this.render();
                 }
             }
         };
@@ -104,6 +108,7 @@
                             },
                             {
                                 id: 'suggesting',
+                                onEntry: actions.suggesting.entry,
                                 states: [
                                     {
                                         id: 'typing',
@@ -122,8 +127,6 @@
 
         var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: true });
         sc.start();
-
-        this.render();
     }
 
     Sugar.prototype.render = function() {
@@ -134,7 +137,8 @@
                     {{/each}}
                 </ul>`;
 
-        this.suggestionContainer.innerHTML = Handlebars.compile(template)(this.model);
+        let HTMLString = Handlebars.compile(template)(this.model);
+        this.suggestionContainer.innerHTML = HTMLString;
     };
 
     Sugar.prototype.changeSelection = function(direction) {
