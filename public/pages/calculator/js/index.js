@@ -13,7 +13,7 @@ function calculator(Sugar, Suggestion, Candy) {
         console.log(suggestion);
     }
 
-    const sugar = new Sugar(document.getElementById('sugar_container'), onType, onSelect);
+    const sugar = new Sugar(document.getElementById('sugar_container'), onType, onSelect, { logStatesEnteredAndExited: true });
     
     /*const candyInstance = new Candy(
         document.getElementById('candy_container'),

@@ -1,7 +1,7 @@
 'use strict';
 
 (function(scion, Handlebars) {
-    function Sugar(container, onType, onSelect) {
+    function Sugar(container, onType, onSelect, options) {
         container.innerHTML = `
             <input type="text" />
         `;
@@ -12,6 +12,7 @@
         container.append(this.suggestionContainer);
 
         this.model = {
+            loading: false,
             selectedIndex: -1,
             suggestions: []
         };
@@ -45,11 +46,17 @@
         var actions = {
             loading: {
                 entry: ev => {
+                    this.model.loading = true;
+                    this.render();
+
                     let suggestionsPromise = onType(ev.data);
 
                     suggestionsPromise.then(function(suggestions) {
                         sc.gen('load', suggestions);
                     });
+                },
+                exit: ev => {
+                    this.model.loading = false;
                 }
             },
             typing: {
@@ -99,6 +106,7 @@
                             {
                                 id: 'loading',
                                 onEntry: actions.loading.entry,
+                                onExit: actions.loading.exit,
                                 transitions: [
                                     {
                                         event: 'load',
@@ -125,7 +133,7 @@
             }
         ];
 
-        var sc = new scion.Statechart({ states: states }, { logStatesEnteredAndExited: true });
+        var sc = new scion.Statechart({ states: states }, options);
         sc.start();
     }
 
